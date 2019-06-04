@@ -1,0 +1,91 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Upload</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col col-md-4"><input type="file" id="fileImage" multiple/></div>
+        <div class="col col-md-4"><a href="#" class="btn btn-primary" onclick="Uploadimage()">Upload</a></div>
+    </div>
+    <div class="row" style="height : 50px;"></div>
+    <div class="row">
+        <div class="col col-md-12">
+            <div class="progress">
+                <div class="progress-bar w-75" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $('.progress').hide();
+
+        var name = $('#fileName').val();
+
+        $("#fileImage").change(function () {
+
+            var File = this.files;
+
+         });
+    });
+
+    var Uploadimage = function () {
+
+        var file = $("#fileImage").get(0).files;
+
+        var data = new FormData;
+        data.append("ImageFile", file[0]);
+        data.append("ProductName", "SamsungA8");
+
+        $.ajax({
+
+            type: "Post",
+            url: "/Upload/Upload",
+            data: data,
+            contentType: false,
+            processData: false,
+            beforeSend: function () {
+                $('.progress-bar').width('0%').text('0%');
+            },
+            xhr: function () {
+                var xhr = new window.XMLHttpRequest();
+                //Upload progress
+                xhr.upload.addEventListener("progress", function (evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = (evt.loaded / evt.total)*100;
+                        //Do something with upload progress
+                        console.log(percentComplete);
+                        if (percentComplete < 99.5) {
+                            $('.progress').show();
+                            $('.progress-bar').width(percentComplete + '%').text(Math.round(percentComplete) + '%');
+                            
+                        }
+                    }
+                }, false);
+                //Download progress
+                //xhr.addEventListener("progress", function (evt) {
+                //    if (evt.lengthComputable) {
+                //        var percentComplete = evt.loaded / evt.total;
+                //        //Do something with download progress
+                //        console.log(percentComplete);
+                //    }
+                //}, false);
+                return xhr;
+            },
+            success: function (response) {                
+                $('.progress-bar').width('100%').text('100%');                
+                setInterval(function () { $('.progress').hide(); }, 3000);
+            }
+
+        })
+
+    }
+
+</script>
